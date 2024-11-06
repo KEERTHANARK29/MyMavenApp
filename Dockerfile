@@ -1,5 +1,5 @@
-# Use an official Maven image as a parent image
-FROM maven:3.8.6-openjdk-17-slim AS build
+# Use Maven 3.8.6 with OpenJDK 17 as the build environment
+FROM maven:3.8.6-jdk-17-slim AS build
 
 # Set the working directory
 WORKDIR /app
@@ -8,23 +8,23 @@ WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copy the rest of the application source code
+# Copy the source code into the container
 COPY src /app/src
 
-# Package the application using Maven
+# Build the app using Maven
 RUN mvn clean package
 
-# Use an official OpenJDK runtime as a parent image for the final image
+# Use OpenJDK runtime to create the final image
 FROM openjdk:17-slim
 
 # Set the working directory for the app
 WORKDIR /app
 
-# Copy the packaged application from the build image
+# Copy the packaged application from the build container
 COPY --from=build /app/target/*.jar /app/app.jar
 
-# Expose the port that the app will run on
+# Expose the port your app will use
 EXPOSE 8080
 
-# Run the application
+# Set the command to run your app
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
