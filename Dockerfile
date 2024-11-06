@@ -1,30 +1,27 @@
-# Use Maven 3.8.6 with OpenJDK 17 as the build environment
-FROM maven:3.8.6-jdk-17-slim AS build
+# Use an official Maven image to build the app
+FROM maven:3.8.6-openjdk-11 as builder
 
 # Set the working directory
 WORKDIR /app
 
-# Copy the pom.xml and download dependencies
+# Copy the pom.xml and the source code
 COPY pom.xml .
-RUN mvn dependency:go-offline
+COPY src ./src
 
-# Copy the source code into the container
-COPY src /app/src
-
-# Build the app using Maven
+# Build the application using Maven
 RUN mvn clean package
 
-# Use OpenJDK runtime to create the final image
-FROM openjdk:17-slim
+# Use a minimal OpenJDK image for running the app
+FROM openjdk:11-jre-slim
 
-# Set the working directory for the app
+# Set the working directory
 WORKDIR /app
 
-# Copy the packaged application from the build container
-COPY --from=build /app/target/*.jar /app/app.jar
+# Copy the jar file from the builder image
+COPY --from=builder /app/target/MyMavenApp-1.0-SNAPSHOT.jar /app/MyMavenApp.jar
 
-# Expose the port your app will use
+# Expose the port the app will run on (optional, adjust if needed)
 EXPOSE 8080
 
-# Set the command to run your app
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+# Run the application
+CMD ["java", "-jar", "MyMavenApp.jar"]
