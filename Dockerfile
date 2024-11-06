@@ -1,21 +1,30 @@
-# Use an official Node.js runtime as a parent image
-FROM node:16
+# Use an official Maven image as a parent image
+FROM maven:3.8.6-openjdk-17-slim AS build
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+# Set the working directory
+WORKDIR /app
 
-# Copy the package.json and package-lock.json (if available)
-# This helps leverage Docker cache for installing dependencies
-COPY package*.json ./
+# Copy the pom.xml and download dependencies
+COPY pom.xml .
+RUN mvn dependency:go-offline
 
-# Install dependencies
-RUN npm install
+# Copy the rest of the application source code
+COPY src /app/src
 
-# Copy the rest of your application code into the container
-COPY . .
+# Package the application using Maven
+RUN mvn clean package
 
-# Expose the port that your app will run on
-EXPOSE 3000
+# Use an official OpenJDK runtime as a parent image for the final image
+FROM openjdk:17-slim
 
-# Command to run your app
-CMD ["npm", "start"]
+# Set the working directory for the app
+WORKDIR /app
+
+# Copy the packaged application from the build image
+COPY --from=build /app/target/*.jar /app/app.jar
+
+# Expose the port that the app will run on
+EXPOSE 8080
+
+# Run the application
+ENTRYPOINT ["java", "-jar", "/app/app.jar"]
