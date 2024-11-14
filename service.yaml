@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mymavenapp-service
+spec:
+  selector:
+    app: mymavenapp
+  ports:
+    - protocol: TCP
+      port: 8080    # The port within the cluster
+      targetPort: 8080 # The port your Tomcat is listening on
+      nodePort: 30081  # The external port on each node (this is a random choice)
+  type: NodePort
