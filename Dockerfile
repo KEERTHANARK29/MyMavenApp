@@ -18,10 +18,10 @@ FROM openjdk:11-jre-slim
 WORKDIR /app
 
 # Copy the jar file from the builder image
-COPY --from=builder /app/target/MyMavenApp-1.0-SNAPSHOT.jar /app/MyMavenApp.jar
+COPY --from=builder /app/target/MyMavenApp-1.0-SNAPSHOT.war /app/MyMavenApp.war
 
 # Expose the port the app will run on (optional, adjust if needed)
-EXPOSE 8080
+EXPOSE 8100
 
 # Run the application
-CMD ["java", "-jar", "MyMavenApp.jar"]
+CMD ["java", "-war", "MyMavenApp.war"]
