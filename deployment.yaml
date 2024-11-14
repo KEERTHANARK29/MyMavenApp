@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mymavenapp-deployment
+spec:
+  replicas: 1  # You can scale this up by changing the number of replicas
+  selector:
+    matchLabels:
+      app: mymavenapp
+  template:
+    metadata:
+      labels:
+        app: mymavenapp
+    spec:
+      containers:
+        - name: mymavenapp
+          image: premgowda07/mymavenapp:latest  # Replace with your image name or push to a registry if required
+          ports:
+            - containerPort: 8080  # Tomcat's port in your case
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mymavenapp-service
+spec:
+  selector:
+    app: mymavenapp
+  ports:
+    - protocol: TCP
+      port: 8080   # The port you want to expose inside the cluster
+      targetPort: 8080  # The port your app is running on inside the container
+      nodePort: 30081  # External port on the node (you can choose any valid port between 30000-32767)
+  type: NodePort  # Set to NodePort to expose via a node IP and port
