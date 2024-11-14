@@ -5,7 +5,7 @@ FROM tomcat:9-jdk11-openjdk-slim
 WORKDIR /usr/local/tomcat/webapps
 
 # Copy the war file to Tomcat's webapps folder
-COPY target/MyMavenApp-1.0-SNAPSHOT.war /usr/local/tomcat/webapps/MyMavenApp.war
+COPY target/MyMavenApp.war /usr/local/tomcat/webapps/MyMavenApp.war
 
 # Expose the port Tomcat will run on (by default, Tomcat runs on 8080)
 EXPOSE 8000
